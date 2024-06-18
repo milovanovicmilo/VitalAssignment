@@ -46,6 +46,10 @@ internal class TodoManagmentViewModel : Screen
         }
     }
 
+    private bool CanAddItems(bool param) => SelectedTodoList != null;
+
+    private bool CanSetItemDone(bool param) => SelectedItem != null && !SelectedItem.Done;
+
     public ICommand AddTodoListCommand { get; private set; }
     public ICommand AddTodoItemCommand { get; private set; }
     public ICommand DoneTodoItemCommand { get; private set; }
@@ -62,8 +66,8 @@ internal class TodoManagmentViewModel : Screen
         await RefereshTodoLists();
 
         AddTodoListCommand = new RelayCommand(AddTodoList);
-        AddTodoItemCommand = new RelayCommand(AddTodoItem);
-        DoneTodoItemCommand = new RelayCommand(DoneTodoItem);
+        AddTodoItemCommand = new RelayCommand(AddTodoItem, CanAddItems);
+        DoneTodoItemCommand = new RelayCommand(DoneTodoItem, CanSetItemDone);
     }
 
     private async Task RefereshTodoLists()
@@ -81,17 +85,26 @@ internal class TodoManagmentViewModel : Screen
     private async void AddTodoList(object obj)
     {
         var todoList = new TodoListViewModel(_sender);
-        await _windowManager.ShowDialogAsync(todoList);
+        var dialogResult = await _windowManager.ShowDialogAsync(todoList);
+        if(dialogResult.HasValue && dialogResult.Value)
+        {
+            await RefereshTodoLists();
+        }
     }
 
     private async void AddTodoItem(object obj)
     {
         var todoItem = new TodoItemViewModel(_sender, SelectedTodoList.Id);
-        await _windowManager.ShowDialogAsync(todoItem);
+        var dialogResult = await _windowManager.ShowDialogAsync(todoItem);
+        if(dialogResult.HasValue && dialogResult.Value)
+        {
+            await RefereshTodoLists();
+        }
     }
 
     private async void DoneTodoItem(object obj)
     {
         await _sender.Send(new DoneTodoItemCommand(SelectedItem.Id));
+        await RefereshTodoLists();
     }
 }

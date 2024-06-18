@@ -1,4 +1,5 @@
-﻿using Assignment.Domain.Enums;
+﻿using Assignment.Domain.Entities;
+using Assignment.Domain.Enums;
 
 namespace Assignment.Application.TodoLists.Queries.GetTodos;
 
@@ -15,4 +16,12 @@ public class TodoItemDto
     public PriorityLevel Priority { get; init; }
 
     public string? Note { get; init; }
+    
+    private class Mapping : Profile
+    {
+        public Mapping()
+        {
+            CreateMap<TodoItem, TodoItemDto>();
+        }
+    }
 }
