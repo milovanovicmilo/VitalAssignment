@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.ComponentModel;
+using System.Windows.Input;
 using Assignment.Application.TodoLists.Commands.CreateTodoList;
 using Caliburn.Micro;
 using MediatR;
@@ -14,6 +15,7 @@ public class TodoListViewModel : Screen
         get => _title;
         set
         {
+            ValidateInputData(value);
             _title = value;
             NotifyOfPropertyChange(() => Title);
         }
@@ -39,5 +41,13 @@ public class TodoListViewModel : Screen
     private async void CloseExecute(object parameter)
     {
         await TryCloseAsync(false);
+    }
+    private void ValidateInputData(string value)
+    {
+        // TODO: Can we use ValidationBehavior here?
+        if (value.Length > 200)
+        {
+            throw new ArgumentException("Title should be longer than 200.");
+        }
     }
 }
