@@ -1,6 +1,7 @@
 ﻿using System.Windows.Input;
 using Assignment.Application.TodoItems.Commands.DoneTodoItem;
 using Assignment.Application.TodoLists.Queries.GetTodos;
+using Assignment.Infrastructure.Cache;
 using Caliburn.Micro;
 using MediatR;
 
@@ -9,6 +10,7 @@ internal class TodoManagmentViewModel : Screen
 {
     private readonly ISender _sender;
     private readonly IWindowManager _windowManager;
+    private readonly ICustomCache _customCache;
 
     private IList<TodoListDto> todoLists;
     public IList<TodoListDto> TodoLists
@@ -43,6 +45,11 @@ internal class TodoManagmentViewModel : Screen
         {
             _selectedItem = value;
             NotifyOfPropertyChange(() => SelectedItem);
+
+            if (SelectedItem != null)
+            {
+                _customCache.GetOrCreate(SelectedItem.Id.ToString(), SelectedItem);
+            }
         }
     }
 
@@ -54,10 +61,11 @@ internal class TodoManagmentViewModel : Screen
     public ICommand AddTodoItemCommand { get; private set; }
     public ICommand DoneTodoItemCommand { get; private set; }
 
-    public TodoManagmentViewModel(ISender sender, IWindowManager windowManager)
+    public TodoManagmentViewModel(ISender sender, IWindowManager windowManager, ICustomCache customCache)
     {
         _sender = sender;
         _windowManager = windowManager;
+        _customCache = customCache;
         Initialize();
     }
 
@@ -105,6 +113,7 @@ internal class TodoManagmentViewModel : Screen
     private async void DoneTodoItem(object obj)
     {
         await _sender.Send(new DoneTodoItemCommand(SelectedItem.Id));
+        _customCache.Set(SelectedItem.Id.ToString(), SelectedItem);
         await RefereshTodoLists();
     }
 }

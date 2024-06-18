@@ -1,5 +1,6 @@
 ﻿using Assignment.Application.Common.Interfaces;
 using Assignment.Domain.Constants;
+using Assignment.Infrastructure.Cache;
 using Assignment.Infrastructure.Data;
 using Assignment.Infrastructure.Data.Interceptors;
 using Assignment.Infrastructure.Identity;
@@ -48,6 +49,8 @@ public static class DependencyInjection
 
         services.AddAuthorization(options =>
             options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
+
+        services.AddSingleton<ICustomCache, CustomCache>();
 
         return services;
     }
