@@ -1,11 +1,13 @@
-﻿namespace Assignment.Infrastructure.Cache;
+﻿using System.Collections.Concurrent;
+
+namespace Assignment.Infrastructure.Cache;
 public class CustomCache : ICustomCache
 {
-    private readonly IDictionary<string, object> _cache;
+    private readonly ConcurrentDictionary<string, object> _cache;
 
     public CustomCache()
     {
-        _cache = new Dictionary<string, object>();
+        _cache = new ConcurrentDictionary<string, object>();
     }
 
     public object Get(string key)
@@ -16,15 +18,8 @@ public class CustomCache : ICustomCache
 
     public void Set(string key, object value) { _cache[key] = value; }
 
-    public object GetOrCreate(string key, object item)
+    public object GetOrAdd(string key, object item)
     {
-        var cachedItem = Get(key);
-        if (cachedItem == null)
-        {
-            _cache[key] = new object();
-            Set(key, item!);
-            cachedItem = _cache[key];
-        }
-        return cachedItem;
+        return _cache.GetOrAdd(key, item);
     }
 }

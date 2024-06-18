@@ -53,7 +53,7 @@ internal class TodoManagmentViewModel : Screen
 
             if (SelectedItem != null)
             {
-                _customCache.GetOrCreate(SelectedItem.Id.ToString(), SelectedItem);
+                _customCache.GetOrAdd(SelectedItem.Id.ToString(), SelectedItem);
             }
         }
     }
@@ -66,7 +66,7 @@ internal class TodoManagmentViewModel : Screen
     public ICommand AddTodoItemCommand { get; private set; }
     public ICommand DoneTodoItemCommand { get; private set; }
 
-    public TodoManagmentViewModel(ISender sender, IWindowManager windowManager, ICustomCache customCache, 
+    public TodoManagmentViewModel(ISender sender, IWindowManager windowManager, ICustomCache customCache,
         IValidator<CreateTodoListCommand> listValidator, IValidator<CreateTodoItemCommand> itemValidator)
     {
         _sender = sender;

@@ -5,5 +5,5 @@ public interface ICustomCache
 
     void Set(string key, object value);
 
-    object GetOrCreate(string key, object value);
+    object GetOrAdd(string key, object value);
 }
