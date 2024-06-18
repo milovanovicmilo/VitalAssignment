@@ -67,7 +67,7 @@ public class TodoItemViewModel : Screen
         await _sender.Send(new CreateTodoItemCommand
         {
             ListId = CurrentItem.ListId,
-            Title = CurrentItem.Title,
+            Title = Title,
             Note = CurrentItem.Note,
             Priority = CurrentItem.Priority
         });
