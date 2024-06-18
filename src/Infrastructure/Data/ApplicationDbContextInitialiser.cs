@@ -103,5 +103,28 @@ public class ApplicationDbContextInitialiser
 
             await _context.SaveChangesAsync();
         }
+
+        if (!_context.Countries.Any())
+        {
+            _context.Countries.Add(new Country
+            {
+                Name = "Netherlands",
+                Cities =
+                {
+                    new City { Name = "Amsterdam" },
+                    new City { Name = "Rotterdam" }
+                }
+            });
+            _context.Countries.Add(new Country
+            {
+                Name = "Serbia",
+                Cities =
+                {
+                    new City { Name = "Belgrade" },
+                    new City { Name = "Novi Sad" }
+                }
+            });
+            await _context.SaveChangesAsync();
+        }
     }
 }
