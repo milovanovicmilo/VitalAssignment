@@ -1,5 +1,8 @@
 ﻿using Assignment.Application.Common.Interfaces;
+using Assignment.Application.TodoItems.Commands.CreateTodoItem;
+using Assignment.Application.TodoLists.Commands.CreateTodoList;
 using Caliburn.Micro;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Assignment.UI;
@@ -12,6 +15,8 @@ public static class DependencyInjection
             .AddTransient<IWindowManager, WindowManager>()
             .AddTransient<MainViewModel>()
             .AddTransient<TodoManagmentViewModel>()
-            .AddTransient<WeatherForecastViewModel>();
+            .AddTransient<WeatherForecastViewModel>()
+            .AddTransient<IValidator<CreateTodoListCommand>, CreateTodoListCommandValidator>()
+            .AddTransient<IValidator<CreateTodoItemCommand>, CreateTodoItemCommandValidator>();
     }
 }

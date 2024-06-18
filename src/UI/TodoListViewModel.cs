@@ -2,12 +2,14 @@
 using System.Windows.Input;
 using Assignment.Application.TodoLists.Commands.CreateTodoList;
 using Caliburn.Micro;
+using FluentValidation;
 using MediatR;
 
 namespace Assignment.UI;
 public class TodoListViewModel : Screen
 {
     private readonly ISender _sender;
+    private readonly IValidator _validator;
 
     private string _title;
     public string Title
@@ -24,9 +26,10 @@ public class TodoListViewModel : Screen
     public ICommand SaveCommand { get; }
     public ICommand CloseCommand { get; }
 
-    public TodoListViewModel(ISender sender)
+    public TodoListViewModel(ISender sender, IValidator validator)
     {
         _sender = sender;
+        _validator = validator;
 
         SaveCommand = new RelayCommand(SaveExecute);
         CloseCommand = new RelayCommand(CloseExecute);
@@ -44,10 +47,20 @@ public class TodoListViewModel : Screen
     }
     private void ValidateInputData(string value)
     {
-        // TODO: Can we use ValidationBehavior here?
-        if (value.Length > 200)
+        var command = new CreateTodoListCommand(value);
+        var validationContext = new ValidationContext<CreateTodoListCommand>(command)
         {
-            throw new ArgumentException("Title should be longer than 200.");
+            RootContextData =
+            {
+                ["Title"] = value,
+            }
+        };
+
+        var validationResult = _validator.ValidateAsync(validationContext);
+
+        if (validationResult != null && validationResult.Result != null && !validationResult.Result.IsValid)
+        {
+            throw new ValidationException(validationResult.Result.ToString());
         }
     }
 }

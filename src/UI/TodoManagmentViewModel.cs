@@ -1,8 +1,11 @@
 ﻿using System.Windows.Input;
+using Assignment.Application.TodoItems.Commands.CreateTodoItem;
 using Assignment.Application.TodoItems.Commands.DoneTodoItem;
+using Assignment.Application.TodoLists.Commands.CreateTodoList;
 using Assignment.Application.TodoLists.Queries.GetTodos;
 using Assignment.Infrastructure.Cache;
 using Caliburn.Micro;
+using FluentValidation;
 using MediatR;
 
 namespace Assignment.UI;
@@ -11,6 +14,8 @@ internal class TodoManagmentViewModel : Screen
     private readonly ISender _sender;
     private readonly IWindowManager _windowManager;
     private readonly ICustomCache _customCache;
+    private readonly IValidator<CreateTodoListCommand> _listValidator;
+    private readonly IValidator<CreateTodoItemCommand> _itemValidator;
 
     private IList<TodoListDto> todoLists;
     public IList<TodoListDto> TodoLists
@@ -61,11 +66,14 @@ internal class TodoManagmentViewModel : Screen
     public ICommand AddTodoItemCommand { get; private set; }
     public ICommand DoneTodoItemCommand { get; private set; }
 
-    public TodoManagmentViewModel(ISender sender, IWindowManager windowManager, ICustomCache customCache)
+    public TodoManagmentViewModel(ISender sender, IWindowManager windowManager, ICustomCache customCache, 
+        IValidator<CreateTodoListCommand> listValidator, IValidator<CreateTodoItemCommand> itemValidator)
     {
         _sender = sender;
         _windowManager = windowManager;
         _customCache = customCache;
+        _listValidator = listValidator;
+        _itemValidator = itemValidator;
         Initialize();
     }
 
@@ -92,7 +100,7 @@ internal class TodoManagmentViewModel : Screen
 
     private async void AddTodoList(object obj)
     {
-        var todoList = new TodoListViewModel(_sender);
+        var todoList = new TodoListViewModel(_sender, _listValidator);
         var dialogResult = await _windowManager.ShowDialogAsync(todoList);
         if(dialogResult.HasValue && dialogResult.Value)
         {
@@ -102,7 +110,7 @@ internal class TodoManagmentViewModel : Screen
 
     private async void AddTodoItem(object obj)
     {
-        var todoItem = new TodoItemViewModel(_sender, SelectedTodoList.Id);
+        var todoItem = new TodoItemViewModel(_sender, _itemValidator, SelectedTodoList.Id);
         var dialogResult = await _windowManager.ShowDialogAsync(todoItem);
         if(dialogResult.HasValue && dialogResult.Value)
         {
